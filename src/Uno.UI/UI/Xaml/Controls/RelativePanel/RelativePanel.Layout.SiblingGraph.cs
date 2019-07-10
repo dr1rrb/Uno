@@ -514,6 +514,9 @@ namespace Windows.UI.Xaml.Controls
 							) :
 							child.Width + spacing;
 
+					ExecuteOnSiblingLayoutInfoIfAvailable(child, siblingLayoutInfos,
+						sli => sli.Center = new Point(availableSize.Width / 2, sli.Center.Y));
+
 					return (availableSize.Width - spacing - size) / 2;
 				}
 
@@ -589,6 +592,9 @@ namespace Windows.UI.Xaml.Controls
 								child.MinHeight + spacing
 							) :
 							child.Height + spacing;
+
+ExecuteOnSiblingLayoutInfoIfAvailable(child, siblingLayoutInfos,
+	sli => sli.Center = new Point(sli.Center.X, availableSize.Height / 2));
 
 					return (availableSize.Height - spacing - size) / 2;
 				}
