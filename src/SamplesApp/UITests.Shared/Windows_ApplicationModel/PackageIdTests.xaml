@@ -1,0 +1,52 @@
+﻿<UserControl
+    x:Class="UITests.Shared.Windows_ApplicationModel.PackageIdTests"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:UITests.Shared.Windows_ApplicationModel"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d"
+    d:DesignHeight="300"
+    d:DesignWidth="400">
+	<UserControl.Resources>
+		<Style TargetType="TextBlock" x:Key="LabelStyle">
+			<Setter Property="FontWeight" Value="Bold" />
+		</Style>
+	</UserControl.Resources>
+	<Grid ColumnSpacing="8">
+		<Grid.RowDefinitions>
+			<RowDefinition Height="Auto" />
+			<RowDefinition Height="Auto" />
+			<RowDefinition Height="Auto" />
+			<RowDefinition Height="Auto" />
+			<RowDefinition Height="Auto" />
+			<RowDefinition Height="Auto" />
+			<RowDefinition Height="Auto" />
+			<RowDefinition Height="Auto" />
+			<RowDefinition Height="Auto" />
+			<RowDefinition Height="Auto" />
+		</Grid.RowDefinitions>
+		<Grid.ColumnDefinitions>
+			<ColumnDefinition Width="Auto" />
+			<ColumnDefinition Width="Auto" />
+		</Grid.ColumnDefinitions>
+		<TextBlock Text="Architecture" Style="{StaticResource LabelStyle}" />
+		<TextBlock Grid.Column="1" Text="{x:Bind Architecture}" />
+		<TextBlock Grid.Row="2" Text="FamilyName" Style="{StaticResource LabelStyle}" />
+		<TextBlock Grid.Column="1" Grid.Row="2" Text="{x:Bind FamilyName}" />
+		<TextBlock Grid.Row="3" Text="FullName" Style="{StaticResource LabelStyle}" />
+		<TextBlock Grid.Column="1" Grid.Row="3" Text="{x:Bind FullName}" />
+		<TextBlock Grid.Row="4" Text="Name" Style="{StaticResource LabelStyle}" />
+		<TextBlock Grid.Column="1" Grid.Row="4" Text="{x:Bind Name}" />
+		<TextBlock Grid.Row="5" Text="ProductId" Style="{StaticResource LabelStyle}" />
+		<TextBlock Grid.Column="1" Grid.Row="5" Text="{x:Bind ProductId}" />
+		<TextBlock Grid.Row="6" Text="Publisher" Style="{StaticResource LabelStyle}" />
+		<TextBlock Grid.Column="1" Grid.Row="6" Text="{x:Bind Publisher}" />
+		<TextBlock Grid.Row="7" Text="PublisherId" Style="{StaticResource LabelStyle}" />
+		<TextBlock Grid.Column="1" Grid.Row="7" Text="{x:Bind PublisherId}" />
+		<TextBlock Grid.Row="8" Text="ResourceId" Style="{StaticResource LabelStyle}" />
+		<TextBlock Grid.Column="1" Grid.Row="8" Text="{x:Bind ResourceId}" />
+		<TextBlock Grid.Row="9" Text="Version" Style="{StaticResource LabelStyle}" />
+		<TextBlock Grid.Column="1" Grid.Row="9" Text="{x:Bind Version}" />
+	</Grid>
+</UserControl>
