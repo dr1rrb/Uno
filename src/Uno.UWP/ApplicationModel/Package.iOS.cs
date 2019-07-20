@@ -22,7 +22,7 @@ namespace Windows.ApplicationModel
 
 			var installDate = NSFileManager.DefaultManager.GetAttributes(urlToDocumentsFolder[0].Path, out var error).CreationDate;
 
-			return (DateTimeOffset)(DateTime)installDate;
+			return (DateTimeOffset)(DateTime)installDate; 
 		}
 		
 		private static bool IsAdHoc
