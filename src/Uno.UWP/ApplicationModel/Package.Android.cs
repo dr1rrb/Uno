@@ -31,6 +31,9 @@ namespace Windows.ApplicationModel
 
 			return DateTimeOffset.FromUnixTimeMilliseconds(packageInfo.FirstInstallTime);
 		}
+
+		private string GetDisplayName() =>
+			Application.Context.PackageManager.GetApplicationLabel(_packageInfo.ApplicationInfo);
 	}
 }
 #endif

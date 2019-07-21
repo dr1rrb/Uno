@@ -1,58 +1,55 @@
-#if __IOS__ 
+#if __IOS__
 #pragma warning disable 108 // new keyword hiding
 #pragma warning disable 114 // new keyword hiding
 using Foundation;
+using System.Reflection;
+using SystemVersion = global::System.Version;
 
 namespace Windows.ApplicationModel
 {
-	public  partial class PackageId 
+	public partial class PackageId
 	{
 		private const string BundleDisplayNameKey = "CFBundleDisplayName";
 		private const string BundleIdentifierKey = "CFBundleIdentifier";
 		private const string BundleShortVersionKey = "CFBundleShortVersionString";
 		private const string BundleVersionKey = "CFBundleVersion";
 
-		[global::Uno.NotImplemented]
-		public global::Windows.System.ProcessorArchitecture Architecture
-		{
-			get
-			{
-				global::Windows.Foundation.Metadata.ApiInformation.TryRaiseNotImplemented("Windows.ApplicationModel.PackageId", "Architecture");
-				return System.ProcessorArchitecture.Unknown;
-			}
-		}
-
-		[global::Uno.NotImplemented]
-		public string FamilyName
-		{
-			get
-			{
-				global::Windows.Foundation.Metadata.ApiInformation.TryRaiseNotImplemented("Windows.ApplicationModel.PackageId", "FamilyName");
-				return "Unknown";
-			}
-		}
+		public string FamilyName => NSBundle.MainBundle.InfoDictionary[BundleIdentifierKey].ToString();
 
 		public string FullName => NSBundle.MainBundle.InfoDictionary[BundleIdentifierKey].ToString();
 
 		public string Name => NSBundle.MainBundle.InfoDictionary[BundleDisplayNameKey].ToString();
 
+		/// <summary>
+		/// Implementation based on
+		/// <see cref="https://stackoverflow.com/questions/7281085/"/>
+		/// </summary>
 		public PackageVersion Version
 		{
 			get
 			{
-				var versionString = NSBundle.MainBundle.InfoDictionary[BundleShortVersionKey].ToString();
+				var shortVersion = NSBundle.MainBundle.InfoDictionary[BundleShortVersionKey].ToString();
 				var bundleVersion = NSBundle.MainBundle.InfoDictionary[BundleVersionKey].ToString();
-				var rawVersion = string.Empty;
-				if (!string.IsNullOrEmpty(versionString) && !bundleVersion.Contains("."))
+
+				var rawVersion = "";
+				//short version is optional
+				if (string.IsNullOrEmpty(shortVersion))
 				{
-					rawVersion = $"{versionString}.";
+					//if not provided, use bundle version only
+					rawVersion = bundleVersion;
 				}
-				rawVersion += bundleVersion;
-
-				// TODO: use Regex to replace alpha char with period
-				string cleanVersion = string.Empty.Replace('a', '.').Replace('b', '.').Replace('d', '.').Replace("fc", ".");
-
-				return Version.Parse(cleanVersion);
+				else
+				{
+					rawVersion = shortVersion;
+					//attach bundle version if a single number
+					if ( ushort.TryParse(bundleVersion, out var buildNumber))
+					{
+						rawVersion += $".{buildNumber}";
+					}
+				}
+				
+				var version = SystemVersion.Parse(rawVersion);
+				return new PackageVersion(version);
 			}
 		}
 	}

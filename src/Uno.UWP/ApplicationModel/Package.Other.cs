@@ -14,6 +14,8 @@ namespace Windows.ApplicationModel
 		private DateTimeOffset GetInstallDate() => DateTimeOffset.Now;
 
 		private string GetInstalledLocation() => Environment.CurrentDirectory;
+
+		private string GetDisplayName() => "";
 	}
 }
 #endif

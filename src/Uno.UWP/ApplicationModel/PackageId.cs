@@ -4,7 +4,6 @@ namespace Windows.ApplicationModel
 {
 	public partial class PackageId
 	{
-#if !__ANDROID__
 		[global::Uno.NotImplemented]
 		public global::Windows.System.ProcessorArchitecture Architecture
 		{
@@ -14,6 +13,8 @@ namespace Windows.ApplicationModel
 				return System.ProcessorArchitecture.Unknown;
 			}
 		}
+
+#if !__ANDROID__ && !__IOS__
 
 		[global::Uno.NotImplemented]
 		public string FamilyName

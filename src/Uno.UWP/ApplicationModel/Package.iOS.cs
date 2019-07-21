@@ -11,6 +11,8 @@ namespace Windows.ApplicationModel
 {
 	public partial class Package
 	{
+		private const string BundleDisplayNameKey = "CFBundleDisplayName";
+
 		private bool GetInnerIsDevelopmentMode() => IsAdHoc;
 
 		private string GetInstalledLocation() 
@@ -24,7 +26,9 @@ namespace Windows.ApplicationModel
 
 			return (DateTimeOffset)(DateTime)installDate;
 		}
-		
+
+		private string GetDisplayName() => NSBundle.MainBundle.InfoDictionary[BundleDisplayNameKey].ToString();
+
 		private static bool IsAdHoc
 			// See https://github.com/bitstadium/HockeySDK-iOS/blob/develop/Classes/BITHockeyHelper.m
 			=> NSBundle.MainBundle.PathForResource("embedded", "mobileprovision").HasValue();

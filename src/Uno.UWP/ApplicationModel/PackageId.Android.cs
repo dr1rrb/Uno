@@ -4,6 +4,8 @@
 using Android.App;
 using Android.Content.PM;
 using Android.Support.V4.Content.PM;
+using Windows.System;
+using System.Reflection;
 using SystemVersion = global::System.Version;
 
 namespace Windows.ApplicationModel
@@ -19,16 +21,6 @@ namespace Windows.ApplicationModel
 				PackageInfoFlags.MetaData);
 		}
 
-		[global::Uno.NotImplemented]
-		public global::Windows.System.ProcessorArchitecture Architecture
-		{
-			get
-			{
-				global::Windows.Foundation.Metadata.ApiInformation.TryRaiseNotImplemented("Windows.ApplicationModel.PackageId", "Architecture");
-				return System.ProcessorArchitecture.Unknown;
-			}
-		}
-
 		public string FamilyName => Application.Context.PackageName;
 
 		public string FullName => Application.Context.PackageName;
@@ -40,11 +32,7 @@ namespace Windows.ApplicationModel
 			get
 			{
 				var version = SystemVersion.Parse(_packageInfo.VersionName);
-				return new PackageVersion(
-					(ushort)version.Major,
-					(ushort)version.Minor,
-					(ushort)version.Build,
-					(ushort)version.Revision);
+				return new PackageVersion(version);
 			}
 		}
 	}

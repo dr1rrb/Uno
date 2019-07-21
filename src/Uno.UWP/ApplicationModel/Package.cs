@@ -30,8 +30,7 @@ namespace Windows.ApplicationModel
 		[global::Uno.NotImplemented]
 		public string Description => "";
 
-		[global::Uno.NotImplemented]
-		public string DisplayName => "";
+		public string DisplayName => GetDisplayName();
 
 		[global::Uno.NotImplemented]
 		public bool IsBundle => false;
