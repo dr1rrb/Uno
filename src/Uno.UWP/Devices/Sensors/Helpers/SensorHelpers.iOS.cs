@@ -12,6 +12,12 @@ namespace Uno.Devices.Sensors.Helpers
 			var date = (DateTime)bootTime.AddSeconds(timestamp);
 			return new DateTimeOffset(date);
 		}
+
+		public static DateTimeOffset TimestampToDateTimeOffset(NSDate date)
+		{
+			var reference = new DateTimeOffset(2001, 1, 1, 0, 0, 0, TimeSpan.Zero);
+			return reference.AddSeconds(date.SecondsSinceReferenceDate);
+		}
 	}
 }
 #endif

@@ -2,41 +2,14 @@
 #pragma warning disable 114 // new keyword hiding
 namespace Windows.Devices.Sensors
 {
-	#if __ANDROID__ || __IOS__ || NET461 || __WASM__ || __MACOS__
+	#if false || false || false || false || false
 	[global::Uno.NotImplemented]
 	#endif
-	public  partial class CompassReading 
+	public partial class CompassReading 
 	{
-		#if __ANDROID__ || __IOS__ || NET461 || __WASM__ || __MACOS__
-		[global::Uno.NotImplemented]
-		public  double HeadingMagneticNorth
-		{
-			get
-			{
-				throw new global::System.NotImplementedException("The member double CompassReading.HeadingMagneticNorth is not implemented in Uno.");
-			}
-		}
-		#endif
-		#if __ANDROID__ || __IOS__ || NET461 || __WASM__ || __MACOS__
-		[global::Uno.NotImplemented]
-		public  double? HeadingTrueNorth
-		{
-			get
-			{
-				throw new global::System.NotImplementedException("The member double? CompassReading.HeadingTrueNorth is not implemented in Uno.");
-			}
-		}
-		#endif
-		#if __ANDROID__ || __IOS__ || NET461 || __WASM__ || __MACOS__
-		[global::Uno.NotImplemented]
-		public  global::System.DateTimeOffset Timestamp
-		{
-			get
-			{
-				throw new global::System.NotImplementedException("The member DateTimeOffset CompassReading.Timestamp is not implemented in Uno.");
-			}
-		}
-		#endif
+		// Skipping already declared property HeadingMagneticNorth
+		// Skipping already declared property HeadingTrueNorth		
+		// Skipping already declared property Timestamp
 		#if __ANDROID__ || __IOS__ || NET461 || __WASM__ || __MACOS__
 		[global::Uno.NotImplemented]
 		public  global::System.TimeSpan? PerformanceCount
@@ -57,16 +30,7 @@ namespace Windows.Devices.Sensors
 			}
 		}
 		#endif
-		#if __ANDROID__ || __IOS__ || NET461 || __WASM__ || __MACOS__
-		[global::Uno.NotImplemented]
-		public  global::Windows.Devices.Sensors.MagnetometerAccuracy HeadingAccuracy
-		{
-			get
-			{
-				throw new global::System.NotImplementedException("The member MagnetometerAccuracy CompassReading.HeadingAccuracy is not implemented in Uno.");
-			}
-		}
-		#endif
+		// Skipping already declared property HeadingAccuracy
 		// Forced skipping of method Windows.Devices.Sensors.CompassReading.Timestamp.get
 		// Forced skipping of method Windows.Devices.Sensors.CompassReading.HeadingMagneticNorth.get
 		// Forced skipping of method Windows.Devices.Sensors.CompassReading.HeadingTrueNorth.get
