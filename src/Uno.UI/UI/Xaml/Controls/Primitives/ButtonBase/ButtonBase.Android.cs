@@ -1,9 +1,12 @@
-﻿using Android.Views;
+﻿using System;
+using Android.Views;
 using Uno.Disposables;
 using Uno.Extensions;
 using Uno.Logging;
 using Uno.UI;
 using Windows.UI.Xaml.Input;
+using Android.Runtime;
+using Java.Interop;
 
 namespace Windows.UI.Xaml.Controls.Primitives
 {
@@ -11,6 +14,12 @@ namespace Windows.UI.Xaml.Controls.Primitives
 	{
 		private readonly SerialDisposable _touchSubscription = new SerialDisposable();
 		private readonly SerialDisposable _isEnabledSubscription = new SerialDisposable();
+
+		partial void PartialInitializeProperties()
+		{
+			// need the Tapped event to be registered for "Click" to work properly
+			Tapped += (snd, evt) => { };
+		}
 
 		protected override void OnLoaded()
 		{
@@ -22,8 +31,6 @@ namespace Windows.UI.Xaml.Controls.Primitives
 			RegisterEvents();
 
 			OnCanExecuteChanged();
-
-			Tapped += HandleTapped;
 		}
 
 		protected override void OnUnloaded()
@@ -31,13 +38,6 @@ namespace Windows.UI.Xaml.Controls.Primitives
 			base.OnUnloaded();
 			_isEnabledSubscription.Disposable = null;
 			_touchSubscription.Disposable = null;
-
-			Tapped -= HandleTapped;
-		}
-
-		private void HandleTapped(object sender, TappedRoutedEventArgs e)
-		{
-			e.Handled = true;
 		}
 
 		partial void OnIsEnabledChangedPartial(bool oldValue, bool newValue)
@@ -65,7 +65,9 @@ namespace Windows.UI.Xaml.Controls.Primitives
 							this.Log().Debug("TouchUpInside, executing command");
 						}
 
-						OnPointerPressed(new PointerRoutedEventArgs { OriginalSource = this });
+						// TODO: Simulate the complete pointer sequence on "this", and remove the Tapped and Click
+						// uiControl.SetOnTouchListener()
+						OnPointerPressed(new PointerRoutedEventArgs(this));
 
 						OnClick();
 
@@ -112,6 +114,6 @@ namespace Windows.UI.Xaml.Controls.Primitives
 				// Finally check for templated ContentControl root
 				?? TemplatedRoot as View
 				;
-		}		
+		}
 	}
 }

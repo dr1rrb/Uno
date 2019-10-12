@@ -19,7 +19,7 @@ namespace Windows.UI.Xaml.Controls
 {
 	public partial class ScrollContentPresenter : UnoTwoDScrollView, IShadowChildrenProvider, DependencyObject
 	{
-		private readonly static List<View> _emptyList = new List<View>(0);
+		private static readonly List<View> _emptyList = new List<View>(0);
 
 		private ScrollBarVisibility _verticalScrollBarVisibility;
 		public ScrollBarVisibility VerticalScrollBarVisibility
@@ -235,15 +235,15 @@ namespace Windows.UI.Xaml.Controls
 			protected override string Name => Panel.Name;
 		}
 
-		protected override void OnScrollChanged(int l, int t, int oldl, int oldt)
+		protected override void OnScrollChanged(int scrollX, int scrollY, bool isIntermediate)
 		{
-			base.OnScrollChanged(l, t, oldl, oldt);
+			// Does nothing, so avoid useless interop!
+			// base.OnScrollChanged(scrollX, scrollY, isIntermediate);
 
-			//TODO: support ScrollViewerViewChangedEventArgs.IsIntermediate from ScrollContentPresenter
 			(TemplatedParent as ScrollViewer)?.OnScrollInternal(
-				ViewHelper.PhysicalToLogicalPixels(l),
-				ViewHelper.PhysicalToLogicalPixels(t),
-				isIntermediate: false
+				ViewHelper.PhysicalToLogicalPixels(scrollX),
+				ViewHelper.PhysicalToLogicalPixels(scrollY),
+				isIntermediate
 			);
 		}
 

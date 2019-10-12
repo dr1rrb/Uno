@@ -153,7 +153,14 @@ namespace Windows.UI.Xaml.Controls
 		public string Text
 		{
 			get { return (string)this.GetValue(TextProperty); }
-			set { this.SetValue(TextProperty, value); }
+			set {
+				if (value == null)
+				{
+					throw new ArgumentNullException();
+				}
+
+				this.SetValue(TextProperty, value);
+			}
 		}
 
 		public static readonly DependencyProperty TextProperty =
@@ -217,7 +224,7 @@ namespace Windows.UI.Xaml.Controls
 #endif
 				{
 					_isInvokingTextChanged = true;
-					TextChanged?.Invoke(this, new TextChangedEventArgs());
+					TextChanged?.Invoke(this, new TextChangedEventArgs(this));
 				}
 #if !HAS_EXPENSIVE_TRYFINALLY // Try/finally incurs a very large performance hit in mono-wasm - https://github.com/mono/mono/issues/13653
 				finally
@@ -243,7 +250,12 @@ namespace Windows.UI.Xaml.Controls
 		{
 			if (!(baseValue is string baseString))
 			{
-				return DependencyProperty.UnsetValue; //TODO: UWP throws ArgumentNullException, in principle we should do the same. 
+				return ""; //Pushing null to the binding resets the text. (Setting null to the Text property directly throws an exception.)
+			}
+
+			if (MaxLength > 0 && baseString.Length > MaxLength)
+			{
+				return DependencyProperty.UnsetValue;
 			}
 
 			var args = new TextBoxBeforeTextChangingEventArgs(baseString);
@@ -664,7 +676,7 @@ namespace Windows.UI.Xaml.Controls
 				&& !IsReadOnly
 				&& !AcceptsReturn
 				&& TextWrapping == TextWrapping.NoWrap
-			// TODO (https://github.com/nventive/Uno/issues/683): && ActualWidth >= TDB / Note: We also have to invoke this method on SizeChanged
+			// TODO (https://github.com/unoplatform/uno/issues/683): && ActualWidth >= TDB / Note: We also have to invoke this method on SizeChanged
 			)
 			{
 				VisualStateManager.GoToState(this, ButtonVisibleStateName, true);
@@ -709,7 +721,7 @@ namespace Windows.UI.Xaml.Controls
 
 		internal void OnSelectionChanged()
 		{
-			SelectionChanged?.Invoke(this, new RoutedEventArgs());
+			SelectionChanged?.Invoke(this, new RoutedEventArgs(this));
 		}
 
 		public void OnTemplateRecycled()

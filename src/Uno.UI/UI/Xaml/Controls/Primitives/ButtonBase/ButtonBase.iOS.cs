@@ -1,18 +1,9 @@
 using System;
-using System.Drawing;
-using Uno.Extensions;
-using Uno.UI.Views;
-using Uno.UI.Views.Controls;
-using Windows.UI.Xaml;
-using Uno.Disposables;
-using System.Windows.Input;
-using Uno.Client;
 using System.Linq;
-using Foundation;
-using CoreGraphics;
-using Uno.UI.Extensions;
-using Windows.UI.Xaml.Input;
+using Uno.Extensions;
+using Uno.Disposables;
 using Uno.Logging;
+using Windows.UI.Xaml.Input;
 
 #if XAMARIN_IOS_UNIFIED
 using UIKit;
@@ -26,8 +17,6 @@ namespace Windows.UI.Xaml.Controls.Primitives
 	{
 		private readonly SerialDisposable _clickSubscription = new SerialDisposable();
 
-		private bool _nativeMode;
-
 		protected override void OnLoaded()
 		{
 			base.OnLoaded();
@@ -35,8 +24,6 @@ namespace Windows.UI.Xaml.Controls.Primitives
 			RegisterEvents();
 
 			OnCanExecuteChanged();
-
-			Tapped += HandleTapped;
 		}
 
 		protected override void OnUnloaded()
@@ -44,13 +31,6 @@ namespace Windows.UI.Xaml.Controls.Primitives
 			base.OnUnloaded();
 
 			_clickSubscription.Disposable = null;
-
-			Tapped -= HandleTapped;
-		}
-
-		private void HandleTapped(object sender, TappedRoutedEventArgs e)
-		{
-			e.Handled = true;
 		}
 
 		partial void RegisterEvents()
@@ -63,71 +43,59 @@ namespace Windows.UI.Xaml.Controls.Primitives
 				return;
 			}
 
-			var uiControl = GetContentElement() as UIControl;
-			if (uiControl != null)
+			if (!(GetContentElement() is UIControl uiControl))
+			{
+				// Button is using Windows template, no native events to register to
+				return;
+			}
+
+			if (this.Log().IsEnabled(Microsoft.Extensions.Logging.LogLevel.Debug))
+			{
+				this.Log().Debug("ControlTemplateRoot is a UIControl, hooking on to AllTouchEvents and TouchUpInside");
+			}
+
+			void pressHandler(object e, EventArgs s)
 			{
 				if (this.Log().IsEnabled(Microsoft.Extensions.Logging.LogLevel.Debug))
 				{
-					this.Log().Debug("ControlTemplateRoot is a UIControl, hooking on to AllTouchEvents and TouchUpInside");
+					this.Log().Debug("AllTouchEvents, trigger OnPointerPressed");
 				}
 
-				void pressHandler(object e, EventArgs s)
-				{
-					if (this.Log().IsEnabled(Microsoft.Extensions.Logging.LogLevel.Debug))
-					{
-						this.Log().Debug("AllTouchEvents, trigger OnPointerPressed");
-					}
-
-					OnPointerPressed(new PointerRoutedEventArgs { OriginalSource = this });
-				}
-
-				void clickHandler(object e, EventArgs s)
-				{
-					if (this.Log().IsEnabled(Microsoft.Extensions.Logging.LogLevel.Debug))
-					{
-						this.Log().Debug("TouchUpInside, executing command");
-					}
-
-					OnClick();
-
-					RaiseEvent(TappedEvent, new TappedRoutedEventArgs { OriginalSource = this });
-				}
-
-				//
-				// Bind the enabled handler
-				// 
-				void enabledHandler(object e, DependencyPropertyChangedEventArgs s)
-				{
-					uiControl.Enabled = IsEnabled;
-				}
-
-				uiControl.AllTouchEvents += pressHandler;
-				uiControl.TouchUpInside += clickHandler;
-				IsEnabledChanged += enabledHandler;
-
-				_nativeMode = true;
-
-				void unregister()
-				{
-					uiControl.AllTouchEvents -= pressHandler;
-					uiControl.TouchUpInside -= clickHandler;
-					IsEnabledChanged -= enabledHandler;
-				}
-
-				_clickSubscription.Disposable = Disposable.Create(unregister);
+				OnPointerPressed(new PointerRoutedEventArgs(this));
 			}
-			else
-			{
-				_nativeMode = false;
-			}
-		}
 
-		protected override void OnTapped(TappedRoutedEventArgs e)
-		{
-			if (!_nativeMode)
+			void clickHandler(object e, EventArgs s)
 			{
+				if (this.Log().IsEnabled(Microsoft.Extensions.Logging.LogLevel.Debug))
+				{
+					this.Log().Debug("TouchUpInside, executing command");
+				}
+
 				OnClick();
+
+				RaiseEvent(TappedEvent, new TappedRoutedEventArgs { OriginalSource = this });
 			}
+
+			//
+			// Bind the enabled handler
+			// 
+			void enabledHandler(object e, DependencyPropertyChangedEventArgs s)
+			{
+				uiControl.Enabled = IsEnabled;
+			}
+
+			uiControl.AllTouchEvents += pressHandler;
+			uiControl.TouchUpInside += clickHandler;
+			IsEnabledChanged += enabledHandler;
+
+			void unregister()
+			{
+				uiControl.AllTouchEvents -= pressHandler;
+				uiControl.TouchUpInside -= clickHandler;
+				IsEnabledChanged -= enabledHandler;
+			}
+
+			_clickSubscription.Disposable = Disposable.Create(unregister);
 		}
 
 		private UIView GetContentElement()

@@ -78,6 +78,8 @@ namespace Windows.UI.Xaml.Data
 			}
 		}
 
+		public object DataItem => _bindingPath.DataItem;
+
 		internal BindingExpression(
 			ManagedWeakReference viewReference,
 			DependencyPropertyDetails targetPropertyDetails,
@@ -119,7 +121,7 @@ namespace Windows.UI.Xaml.Data
 			{
 				ApplyFallbackValue();
 			}
-			
+
 			ApplyExplicitSource();
 			ApplyElementName();
 		}
@@ -408,7 +410,7 @@ namespace Windows.UI.Xaml.Data
 			var weakDataContext = GetWeakDataContext();
 			if (weakDataContext?.IsAlive ?? false)
 			{
-				// Dispose the subscription first, otherwise the previous 
+				// Dispose the subscription first, otherwise the previous
 				// registration may receive the new datacontext value.
 				_subscription.Disposable = null;
 
@@ -465,7 +467,7 @@ namespace Windows.UI.Xaml.Data
 
 			try
 			{
-				if (v == DependencyProperty.UnsetValue)
+				if (v is UnsetValue)
 				{
 					ApplyFallbackValue();
 				}

@@ -6,6 +6,7 @@ using Uno.Extensions;
 using Windows.UI.Xaml.Media;
 using Uno.Logging;
 using Windows.Foundation;
+using System.Globalization;
 
 namespace Windows.UI.Xaml.Controls
 {
@@ -23,6 +24,14 @@ namespace Windows.UI.Xaml.Controls
 				("overflow-x", "visible"),
 				("overflow-y", "visible")
 			);
+
+			if (FeatureConfiguration.TextBox.HideCaret)
+			{
+				SetStyle(
+					("caret-color", "transparent !important")
+				);
+			}
+
 			SetAttribute("tabindex", "0");
 		}
 
@@ -81,22 +90,20 @@ namespace Windows.UI.Xaml.Controls
 			return MeasureView(availableSize);
 		}
 
-		protected override void OnIsEnabledChanged(bool oldValue, bool newValue)
+		internal void SetEnabled(bool newValue)
 		{
-			base.OnIsEnabledChanged(oldValue, newValue);
-
-			SetProperty("disabled", newValue ? "true" : "false");
+			SetProperty("disabled", newValue ? "false" : "true");
 		}
 
 		public int SelectionStart
 		{
-			get => int.Parse(GetProperty("selectionStart"));
+			get => int.TryParse(GetProperty("selectionStart"), NumberStyles.Integer, CultureInfo.InvariantCulture, out var result) ? result : 0;
 			set => SetProperty("selectionStart", value.ToString());
 		}
 
 		public int SelectionEnd
 		{
-			get => int.Parse(GetProperty("selectionEnd"));
+			get => int.TryParse(GetProperty("selectionEnd"), NumberStyles.Integer, CultureInfo.InvariantCulture, out var result) ? result : 0;
 			set => SetProperty("selectionEnd", value.ToString());
 		}
 

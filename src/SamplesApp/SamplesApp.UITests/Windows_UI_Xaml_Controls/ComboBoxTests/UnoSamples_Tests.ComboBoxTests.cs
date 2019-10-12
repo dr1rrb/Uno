@@ -15,6 +15,7 @@ namespace SamplesApp.UITests.Windows_UI_Xaml_Controls.ComboBoxTests
 	public partial class ComboBoxTests_Tests : SampleControlUITestBase
 	{
 		[Test]
+		[AutoRetry]
 		[ActivePlatforms(Platform.iOS)]
 		public void ComboBoxTests_PickerDefaultValue()
 		{
@@ -27,6 +28,7 @@ namespace SamplesApp.UITests.Windows_UI_Xaml_Controls.ComboBoxTests
 		}
 
 		[Test]
+		[AutoRetry]
 		public void ComboBoxTests_Kidnapping()
 		{
 			Run("UITests.Shared.Windows_UI_Xaml_Controls.ComboBox.ComboBox_ComboBoxItem_Selection");
@@ -51,6 +53,9 @@ namespace SamplesApp.UITests.Windows_UI_Xaml_Controls.ComboBoxTests
 			_app.Tap(button);
 			var second = _app.FindWithin("_tb2", presenter);
 			Assert.AreEqual("Item 2", second.GetDependencyPropertyValue<string>("Text"));
+
+			// Close the combo box to not pollute other tests ...
+			_app.TapCoordinates(10, 10);
 
 			Configuration.AttemptToFindTargetBeforeScrolling = scrollingInitial;
 		}

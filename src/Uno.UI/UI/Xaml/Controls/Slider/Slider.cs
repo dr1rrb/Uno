@@ -352,7 +352,7 @@ namespace Windows.UI.Xaml.Controls
 
 			var newOffset = Orientation == Orientation.Horizontal ?
 				point.X / container.ActualWidth :
-				point.Y / container.ActualHeight;
+				1 - (point.Y / container.ActualHeight);
 
 			ApplySlideToValue(newOffset);
 
@@ -391,7 +391,7 @@ namespace Windows.UI.Xaml.Controls
 		{
 			var container = sender as FrameworkElement;
 #if __WASM__
-			if (!container.IsPointerCaptured)
+			if (!container.IsCaptured(e.Pointer))
 			{
 				return;
 			}
