@@ -4,7 +4,8 @@
 
 ### Features
 
-* [#] Support for `Windows.Devices.Lights.Lamp` on iOS, Android.
+* [#2070] Support for `Windows.Devices.Sensors.Pedometer` on iOS, Android.
+* [#2018] Support for `Windows.Devices.Lights.Lamp` on iOS, Android.
 * [#1970](https://github.com/unoplatform/uno/pull/1970) Added support for `AnalyticsInfo` properties on iOS, Android and WASM
 * [#1207] Implemented some `PackageId` properties
 * [#1919](https://github.com/unoplatform/uno/pull/1919) Support for `PathGeometry` on WASM.
