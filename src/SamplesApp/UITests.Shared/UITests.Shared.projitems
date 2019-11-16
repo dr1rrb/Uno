@@ -2413,6 +2413,10 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
+    <Page Include="$(MSBuildThisFileDirectory)Windows_UI_Xaml_Media_Animation\ColorAnimation_Basic.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="$(MSBuildThisFileDirectory)Windows_UI_Xaml_Media_Animation\DoubleAnimationTestsControl.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -2679,7 +2683,7 @@
       <DependentUpon>AutomationProperties_Name.xaml</DependentUpon>
     </Compile>
     <Compile Include="$(MSBuildThisFileDirectory)Windows_UI_Input\PointersTests\Capture.xaml.cs">
-      <DependentUpon>$fileinputname$.xaml</DependentUpon>
+      <DependentUpon>Capture.xaml</DependentUpon>
     </Compile>
     <Compile Include="$(MSBuildThisFileDirectory)Windows_UI_StartScreen\JumpListTests.xaml.cs">
       <DependentUpon>JumpListTests.xaml</DependentUpon>
@@ -3819,6 +3823,9 @@
     </Compile>
     <Compile Include="$(MSBuildThisFileDirectory)Windows_UI_Xaml_Media\Transform\TransformToVisual_Translate2d.xaml.cs">
       <DependentUpon>TransformToVisual_Translate2d.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="$(MSBuildThisFileDirectory)Windows_UI_Xaml_Media_Animation\ColorAnimation_Basic.xaml.cs">
+      <DependentUpon>ColorAnimation_Basic.xaml</DependentUpon>
     </Compile>
     <Compile Include="$(MSBuildThisFileDirectory)Windows_UI_Xaml_Media_Animation\DoubleAnimationTestsControl.xaml.cs">
       <DependentUpon>DoubleAnimationTestsControl.xaml</DependentUpon>
