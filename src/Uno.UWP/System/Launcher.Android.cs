@@ -8,6 +8,7 @@ using Android.Content.PM;
 using Uno.Extensions;
 using Uno.Logging;
 using Microsoft.Extensions.Logging;
+using Windows.Storage;
 
 namespace Windows.System
 {
@@ -20,7 +21,7 @@ namespace Windows.System
 				if (Uno.UI.ContextHelper.Current == null)
 				{
 					throw new InvalidOperationException(
-						"LaunchUriAsync was called too early in application lifetime. " +
+						$"{nameof(LaunchUriAsync)} was called too early in application lifetime. " +
 						"App context needs to be initialized");
 				}
 
@@ -39,6 +40,55 @@ namespace Windows.System
 				}
 
 				return false;
+			}
+		}
+
+		public static Task<bool> LaunchFilePlatformAsync(IStorageFile file)
+		{
+			try
+			{
+				if (Uno.UI.ContextHelper.Current == null)
+				{
+					throw new InvalidOperationException(
+						$"{nameof(LaunchFileAsync)} was called too early in application lifetime. " +
+						"App context needs to be initialized");
+				}
+
+				var context = Uno.UI.ContextHelper.Current;
+
+				var fileContentType =
+					string.IsNullOrWhiteSpace(file.ContentType) ? "*/*" : file.ContentType;
+
+				Android.Net.Uri nativeUri;
+				using (var nativeFile = new Java.IO.File(file.Path))
+				{
+					nativeFile.SetReadable(true);
+
+					nativeUri = Android.Support.V4.Content.FileProvider.GetUriForFile(
+						context,
+						context.PackageName,
+						nativeFile);
+				}
+
+				var intent = new Intent(Intent.ActionView);
+				intent.SetDataAndType(nativeUri, fileContentType);
+				intent.SetFlags(ActivityFlags.GrantReadUriPermission);
+
+				var chooserIntent = Intent.CreateChooser(intent, file.Name ?? string.Empty);
+				chooserIntent.SetFlags(ActivityFlags.ClearTop);
+				chooserIntent.SetFlags(ActivityFlags.NewTask);
+				context.StartActivity(chooserIntent);
+
+				return Task.FromResult(true);
+			}
+			catch (Exception exception)
+			{
+				if (typeof(Launcher).Log().IsEnabled(LogLevel.Error))
+				{
+					typeof(Launcher).Log().Error($"Failed to {nameof(LaunchFileAsync)}.", exception);
+				}
+
+				return Task.FromResult(false);
 			}
 		}
 

@@ -5,6 +5,8 @@ using Uno.Logging;
 using Uno.Extensions;
 using Microsoft.Extensions.Logging;
 using Windows.UI.Core;
+using Windows.Storage;
+using System.Runtime.CompilerServices;
 
 namespace Windows.System
 {
@@ -25,15 +27,7 @@ namespace Windows.System
 				throw new ArgumentNullException(nameof(uri));
 			}
 
-			if (!CoreDispatcher.Main.HasThreadAccess)
-			{
-				if (typeof(Launcher).Log().IsEnabled(LogLevel.Error))
-				{
-					typeof(Launcher).Log().Error($"{nameof(LaunchUriAsync)} must be called on the UI thread");
-				}
-				// LaunchUriAsync throws the following exception if used on UI thread on UWP
-				throw new InvalidOperationException($"{nameof(LaunchUriAsync)} must be called on the UI thread");
-			}
+			EnsureUIThread();
 
 			return LaunchUriPlatformAsync(uri).AsAsyncOperation();
 #else
@@ -47,6 +41,18 @@ namespace Windows.System
 		}
 
 #if __ANDROID__ || __IOS__
+		public static IAsyncOperation<bool> LaunchFileAsync(IStorageFile file)
+		{
+			if (file == null)
+			{
+				throw new ArgumentNullException(nameof(file));
+			}
+
+			EnsureUIThread();
+
+			return LaunchFilePlatformAsync(file).AsAsyncOperation();
+		}
+
 		public static IAsyncOperation<LaunchQuerySupportStatus> QueryUriSupportAsync(
 			Uri uri,
 			LaunchQuerySupportType launchQuerySupportType)
@@ -68,6 +74,18 @@ namespace Windows.System
 					priority: CoreDispatcherPriority.Normal,
 					task: async () => await QueryUriSupportPlatformAsync(uri, launchQuerySupportType)
 				).AsAsyncOperation();
+			}
+		}
+
+		private static void EnsureUIThread([CallerMemberName]string method = "")
+		{
+			if (!CoreDispatcher.Main.HasThreadAccess)
+			{
+				if (typeof(Launcher).Log().IsEnabled(LogLevel.Error))
+				{
+					typeof(Launcher).Log().Error($"{method} must be called on the UI thread");
+				}
+				throw new InvalidOperationException($"{method} must be called on the UI thread");
 			}
 		}
 #endif

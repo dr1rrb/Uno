@@ -2,6 +2,7 @@
 using System.Windows.Input;
 using Uno.UI.Samples.Controls;
 using Uno.UI.Samples.UITests.Helpers;
+using Windows.Storage;
 using Windows.System;
 using Windows.UI.Core;
 using Windows.UI.Xaml.Controls;
@@ -25,6 +26,7 @@ namespace UITests.Shared.Windows_System
 	{
 		private string _uri;
 		private string _error;
+		private string _filePath = "ms-appx:///Assets/test_image_1252_836.png";
 		private LaunchQuerySupportStatus _supportResult;
 
 		public LauncherTestsViewModel(CoreDispatcher dispatcher) : base(dispatcher)
@@ -37,6 +39,16 @@ namespace UITests.Shared.Windows_System
 			set
 			{
 				_uri = value;
+				RaisePropertyChanged();
+			}
+		}
+
+		public string FilePath
+		{
+			get => _filePath;
+			set
+			{
+				_filePath = value;
 				RaisePropertyChanged();
 			}
 		}
@@ -65,6 +77,8 @@ namespace UITests.Shared.Windows_System
 
 		public ICommand LaunchCommand => GetOrCreateCommand(Launch);
 
+		public ICommand LaunchFileCommand => GetOrCreateCommand(LaunchFile);
+
 		private async void Launch()
 		{
 			Error = "";
@@ -78,6 +92,29 @@ namespace UITests.Shared.Windows_System
 				{
 					Error = "Can't parse input as an absolute URI.";
 				}
+			}
+			catch (Exception ex)
+			{
+				Error = ex.ToString();
+			}
+		}
+
+		private async void LaunchFile()
+		{
+			Error = "";
+			try
+			{
+				StorageFile file;
+				if (FilePath.StartsWith("ms-appx:", StringComparison.InvariantCultureIgnoreCase) &&
+					System.Uri.TryCreate(FilePath, UriKind.Absolute, out var parsedUri))
+				{
+					file = await StorageFile.GetFileFromApplicationUriAsync(parsedUri);
+				}
+				else
+				{
+					file = await StorageFile.GetFileFromPathAsync(FilePath);
+				}
+				await Launcher.LaunchFileAsync(file);
 			}
 			catch (Exception ex)
 			{
