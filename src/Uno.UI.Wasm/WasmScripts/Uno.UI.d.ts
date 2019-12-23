@@ -149,6 +149,7 @@ declare namespace Uno.UI {
         static initNative(pParams: number): boolean;
         private containerElement;
         private rootContent;
+        private cursorStyleElement;
         private allActiveElementsById;
         private static resizeMethod;
         private static dispatchEventMethod;
@@ -512,7 +513,7 @@ declare namespace Uno.UI {
          *
          * Note that the casing of this method is intentionally Pascal for platform alignment.
          */
-        SetDependencyPropertyValue(elementId: number, propertyName: string, propertyValue: string): string;
+        SetDependencyPropertyValue(elementId: number, propertyNameAndValue: string): string;
         /**
             * Remove the loading indicator.
             *
@@ -526,6 +527,7 @@ declare namespace Uno.UI {
         private resize;
         private dispatchEvent;
         private getIsConnectedToRootElement;
+        setCursor(cssCursor: string): string;
     }
 }
 declare class StorageFolderMakePersistentParams {
@@ -812,6 +814,12 @@ declare namespace Windows.Devices.Geolocation {
         private static getAccurateCurrentPosition;
     }
 }
+declare namespace Windows.Devices.Midi {
+    class MidiOutPort {
+        static sendDefault(encodedDeviceId: string): void;
+        static sendNoteMessage(encodedDeviceId: string, messageType: number, noteNumber: number, velocity: number): void;
+    }
+}
 interface Window {
     DeviceMotionEvent(): void;
 }
@@ -901,6 +909,15 @@ declare namespace Windows.UI.Xaml {
         Dark = "Dark"
     }
 }
+declare namespace Uno.Devices.Midi.Internal {
+    class WasmMidiAccess {
+        private static midiAccess;
+        private static dispatchRequest;
+        private static initialize;
+        static request(): void;
+        static getMidi(): WebMidi.MIDIAccess;
+    }
+}
 interface Navigator {
     webkitVibrate(pattern: number | number[]): boolean;
     mozVibrate(pattern: number | number[]): boolean;
@@ -910,5 +927,10 @@ declare namespace Windows.Phone.Devices.Notification {
     class VibrationDevice {
         static initialize(): boolean;
         static vibrate(duration: number): boolean;
+    }
+}
+declare namespace Uno.Devices.Enumeration.Internal.Providers.Midi {
+    class MidiDeviceClassProvider {
+        static findDevices(findInputDevices: boolean): string;
     }
 }

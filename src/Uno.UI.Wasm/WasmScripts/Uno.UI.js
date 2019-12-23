@@ -1506,13 +1506,13 @@ var Uno;
              *
              * Note that the casing of this method is intentionally Pascal for platform alignment.
              */
-            SetDependencyPropertyValue(elementId, propertyName, propertyValue) {
+            SetDependencyPropertyValue(elementId, propertyNameAndValue) {
                 if (!WindowManager.setDependencyPropertyValueMethod) {
                     WindowManager.setDependencyPropertyValueMethod = Module.mono_bind_static_method("[Uno.UI] Uno.UI.Helpers.Automation:SetDependencyPropertyValue");
                 }
                 const element = this.getView(elementId);
                 const htmlId = Number(element.getAttribute("XamlHandle"));
-                return WindowManager.setDependencyPropertyValueMethod(htmlId, propertyName, propertyValue);
+                return WindowManager.setDependencyPropertyValueMethod(htmlId, propertyNameAndValue);
             }
             /**
                 * Remove the loading indicator.
@@ -1593,6 +1593,25 @@ var Uno;
                     return false;
                 }
                 return rootElement === element || rootElement.contains(element);
+            }
+            setCursor(cssCursor) {
+                const unoBody = document.getElementById(this.containerElementId);
+                if (unoBody) {
+                    //always cleanup
+                    if (this.cursorStyleElement != undefined) {
+                        this.cursorStyleElement.remove();
+                        this.cursorStyleElement = undefined;
+                    }
+                    //only add custom overriding style if not auto 
+                    if (cssCursor != "auto") {
+                        // this part is only to override default css:  .uno-buttonbase {cursor: pointer;}
+                        this.cursorStyleElement = document.createElement("style");
+                        this.cursorStyleElement.innerHTML = ".uno-buttonbase { cursor: " + cssCursor + "; }";
+                        document.body.appendChild(this.cursorStyleElement);
+                    }
+                    unoBody.style.cursor = cssCursor;
+                }
+                return "ok";
             }
         }
         WindowManager._isHosted = false;
@@ -2536,6 +2555,34 @@ var Windows;
 (function (Windows) {
     var Devices;
     (function (Devices) {
+        var Midi;
+        (function (Midi) {
+            class MidiOutPort {
+                static sendDefault(encodedDeviceId) {
+                    var midi = Uno.Devices.Midi.Internal.WasmMidiAccess.getMidi();
+                    var deviceId = decodeURIComponent(encodedDeviceId);
+                    var noteOnMessage = [0x90, 60, 0x7f]; // note on, middle C, full velocity
+                    var output = midi.outputs.get(deviceId);
+                    output.send(noteOnMessage); //omitting the timestamp means send immediately.
+                    output.send([0x80, 60, 0x40], window.performance.now() + 1000.0); // Inlined array creation- note off, middle C,  
+                    // release velocity = 64, timestamp = now + 1000ms.
+                }
+                static sendNoteMessage(encodedDeviceId, messageType, noteNumber, velocity) {
+                    var midi = Uno.Devices.Midi.Internal.WasmMidiAccess.getMidi();
+                    var deviceId = decodeURIComponent(encodedDeviceId);
+                    var noteOnMessage = [messageType, noteNumber, velocity];
+                    var output = midi.outputs.get(deviceId);
+                    output.send(noteOnMessage);
+                }
+            }
+            Midi.MidiOutPort = MidiOutPort;
+        })(Midi = Devices.Midi || (Devices.Midi = {}));
+    })(Devices = Windows.Devices || (Windows.Devices = {}));
+})(Windows || (Windows = {}));
+var Windows;
+(function (Windows) {
+    var Devices;
+    (function (Devices) {
         var Sensors;
         (function (Sensors) {
             class Accelerometer {
@@ -2775,6 +2822,44 @@ var Windows;
         })(Xaml = UI.Xaml || (UI.Xaml = {}));
     })(UI = Windows.UI || (Windows.UI = {}));
 })(Windows || (Windows = {}));
+var Uno;
+(function (Uno) {
+    var Devices;
+    (function (Devices) {
+        var Midi;
+        (function (Midi) {
+            var Internal;
+            (function (Internal) {
+                class WasmMidiAccess {
+                    static initialize() {
+                        if (!this.dispatchRequest) {
+                            this.dispatchRequest = Module.mono_bind_static_method("[Uno] Uno.Devices.Midi.Internal.WasmMidiAccess:DispatchRequest");
+                        }
+                    }
+                    static request() {
+                        WasmMidiAccess.initialize();
+                        if (navigator.requestMIDIAccess) {
+                            console.log('This browser supports WebMIDI!');
+                            navigator.requestMIDIAccess()
+                                .then((midi) => {
+                                WasmMidiAccess.midiAccess = midi;
+                                return WasmMidiAccess.dispatchRequest(true);
+                            }, () => WasmMidiAccess.dispatchRequest(false));
+                        }
+                        else {
+                            console.log('WebMIDI is not supported in this browser.');
+                            WasmMidiAccess.dispatchRequest(false);
+                        }
+                    }
+                    static getMidi() {
+                        return this.midiAccess;
+                    }
+                }
+                Internal.WasmMidiAccess = WasmMidiAccess;
+            })(Internal = Midi.Internal || (Midi.Internal = {}));
+        })(Midi = Devices.Midi || (Devices.Midi = {}));
+    })(Devices = Uno.Devices || (Uno.Devices = {}));
+})(Uno || (Uno = {}));
 var Windows;
 (function (Windows) {
     var Phone;
@@ -2800,3 +2885,45 @@ var Windows;
         })(Devices = Phone.Devices || (Phone.Devices = {}));
     })(Phone = Windows.Phone || (Windows.Phone = {}));
 })(Windows || (Windows = {}));
+var Uno;
+(function (Uno) {
+    var Devices;
+    (function (Devices) {
+        var Enumeration;
+        (function (Enumeration) {
+            var Internal;
+            (function (Internal) {
+                var Providers;
+                (function (Providers) {
+                    var Midi;
+                    (function (Midi) {
+                        class MidiDeviceClassProvider {
+                            static findDevices(findInputDevices) {
+                                var result = "";
+                                var midi = Uno.Devices.Midi.Internal.WasmMidiAccess.getMidi();
+                                if (findInputDevices) {
+                                    midi.inputs.forEach((input, key) => {
+                                        var inputId = input.id;
+                                        var name = input.name;
+                                        var encodedMetadata = encodeURIComponent(inputId) + '#' + encodeURIComponent(name);
+                                        result += encodedMetadata + '&';
+                                    });
+                                }
+                                else {
+                                    midi.outputs.forEach((output, key) => {
+                                        var inputId = output.id;
+                                        var name = output.name;
+                                        var encodedMetadata = encodeURIComponent(inputId) + '#' + encodeURIComponent(name);
+                                        result += encodedMetadata + '&';
+                                    });
+                                }
+                                return result;
+                            }
+                        }
+                        Midi.MidiDeviceClassProvider = MidiDeviceClassProvider;
+                    })(Midi = Providers.Midi || (Providers.Midi = {}));
+                })(Providers = Internal.Providers || (Internal.Providers = {}));
+            })(Internal = Enumeration.Internal || (Enumeration.Internal = {}));
+        })(Enumeration = Devices.Enumeration || (Devices.Enumeration = {}));
+    })(Devices = Uno.Devices || (Uno.Devices = {}));
+})(Uno || (Uno = {}));
