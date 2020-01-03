@@ -10,6 +10,7 @@ declare namespace Windows.UI.Core {
     class CoreDispatcher {
         static _coreDispatcherCallback: any;
         static _isIOS: boolean;
+        static _isSafari: boolean;
         static _isFirstCall: boolean;
         static _isReady: Promise<boolean>;
         static _isWaitingReady: boolean;
@@ -148,10 +149,12 @@ declare namespace Uno.UI {
         static initNative(pParams: number): boolean;
         private containerElement;
         private rootContent;
+        private cursorStyleElement;
         private allActiveElementsById;
         private static resizeMethod;
         private static dispatchEventMethod;
         private static getDependencyPropertyValueMethod;
+        private static setDependencyPropertyValueMethod;
         private constructor();
         /**
             * Creates the UWP-compatible splash screen
@@ -506,6 +509,12 @@ declare namespace Uno.UI {
          */
         GetDependencyPropertyValue(elementId: number, propertyName: string): string;
         /**
+         * Sets a dependency property value.
+         *
+         * Note that the casing of this method is intentionally Pascal for platform alignment.
+         */
+        SetDependencyPropertyValue(elementId: number, propertyNameAndValue: string): string;
+        /**
             * Remove the loading indicator.
             *
             * In a future version it will also handle the splashscreen.
@@ -518,6 +527,7 @@ declare namespace Uno.UI {
         private resize;
         private dispatchEvent;
         private getIsConnectedToRootElement;
+        setCursor(cssCursor: string): string;
     }
 }
 declare class StorageFolderMakePersistentParams {
@@ -880,6 +890,11 @@ declare namespace Windows.UI.Core {
         enable(): void;
         disable(): void;
         private clearStack;
+    }
+}
+declare namespace Windows.UI.ViewManagement {
+    class ApplicationViewTitleBar {
+        static setBackgroundColor(colorString: string): void;
     }
 }
 declare namespace Windows.UI.Xaml {

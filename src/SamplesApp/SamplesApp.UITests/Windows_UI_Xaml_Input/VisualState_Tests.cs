@@ -16,6 +16,7 @@ namespace SamplesApp.UITests.Windows_UI_Xaml_Input
 	public class VisualState_Tests : SampleControlUITestBase
 	{
 		[Test]
+		[AutoRetry]
 		[ActivePlatforms(Platform.iOS, Platform.Android)]
 		public void TestButtonReleasedOut() => TestButtonReleasedOutState(
 			"MyButton",
@@ -24,6 +25,7 @@ namespace SamplesApp.UITests.Windows_UI_Xaml_Input
 			"CommonStates.Normal");
 
 		[Test]
+		[AutoRetry]
 		[ActivePlatforms(Platform.iOS, Platform.Android)]
 		public void TestIndeterminateToggleButtonReleasedOut() => TestButtonReleasedOutState(
 			"MyIndeterminateToggleButton",
@@ -32,6 +34,7 @@ namespace SamplesApp.UITests.Windows_UI_Xaml_Input
 			"CommonStates.Indeterminate");
 
 		[Test]
+		[AutoRetry]
 		[ActivePlatforms(Platform.iOS, Platform.Android)]
 		public void TestCheckedToggleButtonReleasedOut() => TestButtonReleasedOutState(
 			"MyCheckedToggleButton",
@@ -40,6 +43,7 @@ namespace SamplesApp.UITests.Windows_UI_Xaml_Input
 			"CommonStates.Checked");
 
 		[Test]
+		[AutoRetry]
 		[Ignore("We get an invalid 'PointerOver' on release, a fix in pending in another PR")]
 		public void TestUncheckedToggleButtonReleasedOut() => TestButtonReleasedOutState(
 			"MyUncheckedToggleButton",
@@ -48,6 +52,7 @@ namespace SamplesApp.UITests.Windows_UI_Xaml_Input
 			"CommonStates.Unchecked");
 
 		[Test]
+		[AutoRetry]
 		[ActivePlatforms(Platform.iOS, Platform.Android)]
 		public void TestRadioButtonReleasedOut() => TestButtonReleasedOutState(
 			"MyRadioButton",
@@ -56,6 +61,7 @@ namespace SamplesApp.UITests.Windows_UI_Xaml_Input
 			"CommonStates.Normal");
 
 		[Test]
+		[AutoRetry]
 		[ActivePlatforms(Platform.iOS, Platform.Android)]
 		public void TestHyperlinkButtonReleasedOut() => TestButtonReleasedOutState(
 			"MyHyperlinkButton",
@@ -64,6 +70,7 @@ namespace SamplesApp.UITests.Windows_UI_Xaml_Input
 			"CommonStates.Normal");
 
 		[Test]
+		[AutoRetry]
 		[ActivePlatforms(Platform.iOS, Platform.Android)]
 		public void TestIndeterminateCheckboxReleasedOut() => TestButtonReleasedOutState(
 			"MyIndeterminateCheckbox",
@@ -72,6 +79,7 @@ namespace SamplesApp.UITests.Windows_UI_Xaml_Input
 			"CombinedStates.IndeterminateNormal");
 
 		[Test]
+		[AutoRetry]
 		[ActivePlatforms(Platform.iOS, Platform.Android)]
 		public void TestCheckedCheckboxReleasedOut() => TestButtonReleasedOutState(
 			"MyCheckedCheckbox",
@@ -80,6 +88,7 @@ namespace SamplesApp.UITests.Windows_UI_Xaml_Input
 			"CombinedStates.CheckedNormal");
 
 		[Test]
+		[AutoRetry]
 		[ActivePlatforms(Platform.iOS, Platform.Android)]
 		public void TestUncheckedCheckboxReleasedOut() => TestButtonReleasedOutState(
 			"MyUncheckedCheckbox",
@@ -88,10 +97,12 @@ namespace SamplesApp.UITests.Windows_UI_Xaml_Input
 			"CombinedStates.UncheckedNormal");
 
 		[Test]
+		[AutoRetry]
 		public void TestHyperlinkReleasedOut() => TestButtonReleasedOutState(
 			"MyHyperlink"); // There is no "VisualState" for Hyperlink, only a hardcoded opacity of .5 (kind-of like UWP)
 
 		[Test]
+		[AutoRetry]
 		public void TestListViewReleasedOut()
 		{
 			Run("UITests.Shared.Windows_UI_Input.VisualStatesTests.ListViewItem");
@@ -103,36 +114,33 @@ namespace SamplesApp.UITests.Windows_UI_Xaml_Input
 			_app.DragCoordinates(rect.X + 10, rect.Y + 10, rect.X - 30, rect.Y);
 
 			var final = TakeScreenshot("Final");
-			AssertScreenshotsAreEqual(initial, final, rect);
+			ImageAssert.AreEqual(initial, final, rect);
 		}
 
 		[Test]
-		public void TestTextBoxReleaseOut() => TestTextBoxReleasedOutState(
-			"MyTextBox",
-			"CommonStates.PointerOver",
-			"CommonStates.Focused");
+		[AutoRetry]
+		public void TestTextBoxReleaseOut()
+		{
+			Run("UITests.Shared.Windows_UI_Input.VisualStatesTests.TextBox_VisualStates");
+
+			// Note: We don not validateFinalStateScreenShot as we are expecting to finish "focused" so may have the flashing cursor.
+			TestVisualTests("MyTextBox", ReleaseOut, validateFinalStateScreenShot: false, "CommonStates.PointerOver", "CommonStates.Focused");
+		}
 
 		[Test]
-		public void TestTextBoxTap() => TestTextBoxTappedState(
-			"MyTextBox",
-			"CommonStates.PointerOver",
-			"CommonStates.Focused");
+		[AutoRetry]
+		public void TestTextBoxTap()
+		{
+			Run("UITests.Shared.Windows_UI_Input.VisualStatesTests.TextBox_VisualStates");
+
+			// Note: We don not validateFinalStateScreenShot as we are expecting to finish "focused" so may have the flashing cursor.
+			TestVisualTests("MyTextBox", Tap, validateFinalStateScreenShot: false, "CommonStates.PointerOver", "CommonStates.Focused");
+		}
 
 		private void TestButtonReleasedOutState(string target, params string[] expectedStates)
 		{
 			Run("UITests.Shared.Windows_UI_Input.VisualStatesTests.Buttons");
-			TestVisualTests(target, ReleaseOut, expectedStates);
-		}
-
-		private void TestTextBoxReleasedOutState(string target, params string[] expectedStates)
-		{
-			Run("UITests.Shared.Windows_UI_Input.VisualStatesTests.TextBox_VisualStates");
-			TestVisualTests(target, ReleaseOut, expectedStates);
-		}
-		private void TestTextBoxTappedState(string target, params string[] expectedStates)
-		{
-			Run("UITests.Shared.Windows_UI_Input.VisualStatesTests.TextBox_VisualStates");
-			TestVisualTests(target, Tap, expectedStates);
+			TestVisualTests(target, ReleaseOut, true, expectedStates);
 		}
 
 		// Press over and move out to release
@@ -142,14 +150,14 @@ namespace SamplesApp.UITests.Windows_UI_Xaml_Input
 		private void Tap(IAppRect target)
 			=> _app.TapCoordinates(target.X + 2, target.Y + 2);
 
-		private void TestVisualTests(string targetName, Action<IAppRect> act, params string[] expectedStates)
+		private void TestVisualTests(string targetName, Action<IAppRect> act, bool validateFinalStateScreenShot, params string[] expectedStates)
 		{
-			var initial = TakeScreenshot("Initial");
+			var initial = TakeScreenshot("Initial", ignoreInSnapshotCompare: true);
 			var target = _app.WaitForElement(targetName).Single().Rect;
 
 			act(target);
 
-			var final = TakeScreenshot("Final");
+			var final = TakeScreenshot("Final", ignoreInSnapshotCompare: true);
 			var actualStates = _app
 				.Marked("VisualStatesLog")
 				.GetDependencyPropertyValue<string>("Text")
@@ -163,9 +171,12 @@ namespace SamplesApp.UITests.Windows_UI_Xaml_Input
 				CollectionAssert.AreEqual(expectedStates, actualStates, StringComparer.OrdinalIgnoreCase);
 			}
 
-			// For the comparison, we compare only the location of the control (i.e. we provide the rect).
-			// This is required to NOT include the visual output ot the states (on the right of the test control)
-			AssertScreenshotsAreEqual(initial, final, target);
+			if (validateFinalStateScreenShot)
+			{
+				// For the comparison, we compare only the location of the control (i.e. we provide the rect).
+				// This is required to NOT include the visual output ot the states (on the right of the test control)
+				ImageAssert.AreEqual(initial, final, target);
+			}
 		}
 	}
 }

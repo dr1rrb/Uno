@@ -39,6 +39,7 @@ var Windows;
                     CoreDispatcher.initMethods();
                     CoreDispatcher._isReady = isReady;
                     CoreDispatcher._isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+                    CoreDispatcher._isSafari = /^((?!chrome|android).)*safari/i.test(navigator.userAgent);
                 }
                 /**
                  * Enqueues a core dispatcher callback on the javascript's event loop
@@ -63,14 +64,14 @@ var Windows;
                     return true;
                 }
                 static InnerWakeUp() {
-                    if (CoreDispatcher._isIOS && CoreDispatcher._isFirstCall) {
+                    if ((CoreDispatcher._isIOS || CoreDispatcher._isSafari) && CoreDispatcher._isFirstCall) {
                         //
                         // This is a workaround for the available call stack during the first 5 (?) seconds
                         // of the startup of an application. See https://github.com/mono/mono/issues/12357 for
                         // more details.
                         //
                         CoreDispatcher._isFirstCall = false;
-                        console.debug("Detected iOS, delaying first CoreDispatched dispatch for 5s (see https://github.com/mono/mono/issues/12357)");
+                        console.warn("Detected iOS, delaying first CoreDispatcher dispatch for 5 seconds (see https://github.com/mono/mono/issues/12357)");
                         window.setTimeout(() => this.WakeUp(), 5000);
                     }
                     else {
@@ -999,7 +1000,7 @@ var Uno;
                     }
                     src = src.parentElement;
                 }
-                return `${evt.pointerId};${evt.clientX};${evt.clientY};${(evt.ctrlKey ? "1" : "0")};${(evt.shiftKey ? "1" : "0")};${evt.button};${evt.pointerType};${srcHandle};${evt.timeStamp}`;
+                return `${evt.pointerId};${evt.clientX};${evt.clientY};${(evt.ctrlKey ? "1" : "0")};${(evt.shiftKey ? "1" : "0")};${evt.buttons};${evt.button};${evt.pointerType};${srcHandle};${evt.timeStamp}`;
             }
             /**
              * keyboard event extractor to be used with registerEventOnView
@@ -1501,6 +1502,19 @@ var Uno;
                 return WindowManager.getDependencyPropertyValueMethod(htmlId, propertyName);
             }
             /**
+             * Sets a dependency property value.
+             *
+             * Note that the casing of this method is intentionally Pascal for platform alignment.
+             */
+            SetDependencyPropertyValue(elementId, propertyNameAndValue) {
+                if (!WindowManager.setDependencyPropertyValueMethod) {
+                    WindowManager.setDependencyPropertyValueMethod = Module.mono_bind_static_method("[Uno.UI] Uno.UI.Helpers.Automation:SetDependencyPropertyValue");
+                }
+                const element = this.getView(elementId);
+                const htmlId = Number(element.getAttribute("XamlHandle"));
+                return WindowManager.setDependencyPropertyValueMethod(htmlId, propertyNameAndValue);
+            }
+            /**
                 * Remove the loading indicator.
                 *
                 * In a future version it will also handle the splashscreen.
@@ -1579,6 +1593,25 @@ var Uno;
                     return false;
                 }
                 return rootElement === element || rootElement.contains(element);
+            }
+            setCursor(cssCursor) {
+                const unoBody = document.getElementById(this.containerElementId);
+                if (unoBody) {
+                    //always cleanup
+                    if (this.cursorStyleElement != undefined) {
+                        this.cursorStyleElement.remove();
+                        this.cursorStyleElement = undefined;
+                    }
+                    //only add custom overriding style if not auto 
+                    if (cssCursor != "auto") {
+                        // this part is only to override default css:  .uno-buttonbase {cursor: pointer;}
+                        this.cursorStyleElement = document.createElement("style");
+                        this.cursorStyleElement.innerHTML = ".uno-buttonbase { cursor: " + cssCursor + "; }";
+                        document.body.appendChild(this.cursorStyleElement);
+                    }
+                    unoBody.style.cursor = cssCursor;
+                }
+                return "ok";
             }
         }
         WindowManager._isHosted = false;
@@ -2724,6 +2757,41 @@ var Windows;
             }
             Core.SystemNavigationManager = SystemNavigationManager;
         })(Core = UI.Core || (UI.Core = {}));
+    })(UI = Windows.UI || (Windows.UI = {}));
+})(Windows || (Windows = {}));
+var Windows;
+(function (Windows) {
+    var UI;
+    (function (UI) {
+        var ViewManagement;
+        (function (ViewManagement) {
+            class ApplicationViewTitleBar {
+                static setBackgroundColor(colorString) {
+                    if (colorString == null) {
+                        //remove theme-color meta
+                        var metaThemeColorEntries = document.querySelectorAll("meta[name='theme-color']");
+                        for (let entry of metaThemeColorEntries) {
+                            entry.remove();
+                        }
+                    }
+                    else {
+                        var metaThemeColorEntries = document.querySelectorAll("meta[name='theme-color']");
+                        var metaThemeColor;
+                        if (metaThemeColorEntries.length == 0) {
+                            //create meta
+                            metaThemeColor = document.createElement("meta");
+                            metaThemeColor.setAttribute("name", "theme-color");
+                            document.head.appendChild(metaThemeColor);
+                        }
+                        else {
+                            metaThemeColor = metaThemeColorEntries[0];
+                        }
+                        metaThemeColor.setAttribute("content", colorString);
+                    }
+                }
+            }
+            ViewManagement.ApplicationViewTitleBar = ApplicationViewTitleBar;
+        })(ViewManagement = UI.ViewManagement || (UI.ViewManagement = {}));
     })(UI = Windows.UI || (Windows.UI = {}));
 })(Windows || (Windows = {}));
 var Windows;

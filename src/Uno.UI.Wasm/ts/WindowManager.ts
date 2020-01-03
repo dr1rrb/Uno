@@ -128,11 +128,14 @@
 		private containerElement: HTMLDivElement;
 		private rootContent: HTMLElement;
 
+		private cursorStyleElement: HTMLElement;
+
 		private allActiveElementsById: { [id: number]: HTMLElement | SVGElement } = {};
 
 		private static resizeMethod: any;
 		private static dispatchEventMethod: any;
 		private static getDependencyPropertyValueMethod: any;
+		private static setDependencyPropertyValueMethod: any;
 
 		private constructor(private containerElementId: string, private loadingElementId: string) {
 			this.initDom();
@@ -898,7 +901,7 @@
 				src = src.parentElement;
 			}
 
-			return `${evt.pointerId};${evt.clientX};${evt.clientY};${(evt.ctrlKey ? "1" : "0")};${(evt.shiftKey ? "1" : "0")};${evt.button};${evt.pointerType};${srcHandle};${evt.timeStamp}`;
+			return `${evt.pointerId};${evt.clientX};${evt.clientY};${(evt.ctrlKey ? "1" : "0")};${(evt.shiftKey ? "1" : "0")};${evt.buttons};${evt.button};${evt.pointerType};${srcHandle};${evt.timeStamp}`;
 		}
 
 		/**
@@ -1551,6 +1554,22 @@
 		}
 
 		/**
+		 * Sets a dependency property value.
+		 *
+		 * Note that the casing of this method is intentionally Pascal for platform alignment.
+		 */
+		public SetDependencyPropertyValue(elementId: number, propertyNameAndValue: string) : string {
+			if (!WindowManager.setDependencyPropertyValueMethod) {
+				WindowManager.setDependencyPropertyValueMethod = (<any>Module).mono_bind_static_method("[Uno.UI] Uno.UI.Helpers.Automation:SetDependencyPropertyValue");
+			}
+
+			const element = this.getView(elementId) as HTMLElement;
+			const htmlId = Number(element.getAttribute("XamlHandle"));
+
+			return WindowManager.setDependencyPropertyValueMethod(htmlId, propertyNameAndValue);
+		}
+
+		/**
 			* Remove the loading indicator.
 			*
 			* In a future version it will also handle the splashscreen.
@@ -1648,6 +1667,32 @@
 				return false;
 			}
 			return rootElement === element || rootElement.contains(element);
+		}
+
+		public setCursor(cssCursor: string): string {
+			const unoBody = document.getElementById(this.containerElementId);
+
+			if (unoBody) {
+
+				//always cleanup
+				if (this.cursorStyleElement != undefined) {
+					this.cursorStyleElement.remove();
+					this.cursorStyleElement= undefined
+				}
+
+				//only add custom overriding style if not auto 
+				if (cssCursor != "auto") {
+
+					// this part is only to override default css:  .uno-buttonbase {cursor: pointer;}
+
+					this.cursorStyleElement = document.createElement("style");
+					this.cursorStyleElement.innerHTML = ".uno-buttonbase { cursor: " + cssCursor + "; }";
+					document.body.appendChild(this.cursorStyleElement);
+				}
+
+				unoBody.style.cursor = cssCursor;
+			}
+			return "ok";
 		}
 	}
 
