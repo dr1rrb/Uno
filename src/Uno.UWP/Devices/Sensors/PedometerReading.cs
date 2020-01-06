@@ -1,3 +1,4 @@
+#if __IOS__ || __ANDROID__
 using System;
 
 namespace Windows.Devices.Sensors
@@ -25,3 +26,4 @@ namespace Windows.Devices.Sensors
 		public DateTimeOffset Timestamp { get; }
 	}
 }
+#endif

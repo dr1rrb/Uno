@@ -1,3 +1,4 @@
+#if __ANDROID__ || __IOS__
 namespace Windows.Devices.Sensors
 {
 	public partial class PedometerReadingChangedEventArgs
@@ -11,3 +12,4 @@ namespace Windows.Devices.Sensors
 		public PedometerReading Reading { get; }
 	}
 }
+#endif

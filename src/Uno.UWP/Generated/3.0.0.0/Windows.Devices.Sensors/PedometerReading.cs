@@ -2,15 +2,51 @@
 #pragma warning disable 114 // new keyword hiding
 namespace Windows.Devices.Sensors
 {
-	#if false || false || false || false || false
+	#if false || false || NET461 || __WASM__ || __MACOS__
 	[global::Uno.NotImplemented]
 	#endif
 	public  partial class PedometerReading 
 	{
-		// Skipping already declared property CumulativeSteps
-		// Skipping already declared property CumulativeStepsDuration
-		// Skipping already declared property StepKind
-		// Skipping already declared property Timestamp
+		#if false || false || NET461 || __WASM__ || __MACOS__
+		[global::Uno.NotImplemented]
+		public  int CumulativeSteps
+		{
+			get
+			{
+				throw new global::System.NotImplementedException("The member int PedometerReading.CumulativeSteps is not implemented in Uno.");
+			}
+		}
+		#endif
+		#if false || false || NET461 || __WASM__ || __MACOS__
+		[global::Uno.NotImplemented]
+		public  global::System.TimeSpan CumulativeStepsDuration
+		{
+			get
+			{
+				throw new global::System.NotImplementedException("The member TimeSpan PedometerReading.CumulativeStepsDuration is not implemented in Uno.");
+			}
+		}
+		#endif
+		#if false || false || NET461 || __WASM__ || __MACOS__
+		[global::Uno.NotImplemented]
+		public  global::Windows.Devices.Sensors.PedometerStepKind StepKind
+		{
+			get
+			{
+				throw new global::System.NotImplementedException("The member PedometerStepKind PedometerReading.StepKind is not implemented in Uno.");
+			}
+		}
+		#endif
+		#if false || false || NET461 || __WASM__ || __MACOS__
+		[global::Uno.NotImplemented]
+		public  global::System.DateTimeOffset Timestamp
+		{
+			get
+			{
+				throw new global::System.NotImplementedException("The member DateTimeOffset PedometerReading.Timestamp is not implemented in Uno.");
+			}
+		}
+		#endif
 		// Forced skipping of method Windows.Devices.Sensors.PedometerReading.StepKind.get
 		// Forced skipping of method Windows.Devices.Sensors.PedometerReading.CumulativeSteps.get
 		// Forced skipping of method Windows.Devices.Sensors.PedometerReading.Timestamp.get
