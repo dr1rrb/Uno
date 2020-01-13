@@ -17,7 +17,7 @@ namespace Windows.UI.Xaml.Input
 		private readonly NSEvent _nativeEvent;
 		private readonly NSSet _nativeTouches;
 
-		internal PointerRoutedEventArgs(NSSet touches, NSEvent nativeEvent) : this()
+		internal PointerRoutedEventArgs(NSSet touches, NSEvent nativeEvent, UIElement receiver) : this()
 		{
 			_nativeEvent = nativeEvent;
 			_nativeTouches = touches;
@@ -30,7 +30,7 @@ namespace Windows.UI.Xaml.Input
 			FrameId = ToFrameId(_nativeEvent.Timestamp);
 			Pointer = new Pointer(pointerId, pointerDeviceType, isInContact, isInRange: true);
 			KeyModifiers = System.VirtualKeyModifiers.None; //TODO: Properly set virtual key modifiers
-			OriginalSource = null; //TODO: get original source
+			OriginalSource = receiver; //TODO: get original source
 			CanBubbleNatively = true;
 		}
 
